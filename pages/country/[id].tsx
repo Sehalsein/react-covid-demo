@@ -104,18 +104,35 @@ const CountryDetailPage = () => {
                         <h1 className="text-3xl font-bold text-blue-600">
                             {data.location}
                         </h1>
-                        <span className="text-xs">Last Updated on ASD</span>
+                        {/* <span className="text-xs">Last Updated on ASD</span> */}
                     </div>
-                    <div className="flex flex-col gap-0 text-right">
-                        <span className="text-xs font-medium text-blue-600">
-                            Tested
-                        </span>
-                        <h1 className="text-xl font-bold text-blue-600">
-                            {(data.data || [])
-                                .reduce((a, b) => b.total_tests || a, 0)
-                                .toLocaleString()}
-                        </h1>
-                    </div>
+                    <button
+                        className="flex gap-2 rounded-md bg-blue-600 px-2 py-2 text-right text-white"
+                        onClick={() => {
+                            router.push({
+                                pathname: '/compare',
+                                query: {
+                                    code: data.iso_code,
+                                },
+                            })
+                        }}
+                    >
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-6 w-6"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            strokeWidth={2}
+                        >
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2"
+                            />
+                        </svg>
+                        Compare
+                    </button>
                 </div>
 
                 <LatestStatsSection

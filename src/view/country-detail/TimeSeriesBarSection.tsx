@@ -3,6 +3,7 @@ import {
     BarElement,
     CategoryScale,
     Chart as ChartJS,
+    Filler,
     Legend,
     LinearScale,
     Title,
@@ -10,20 +11,35 @@ import {
 } from 'chart.js'
 import format from 'date-fns/format'
 import { useEffect, useState } from 'react'
-import { Bar } from 'react-chartjs-2'
+import { Line } from 'react-chartjs-2'
 
-ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
+ChartJS.register(
+    CategoryScale,
+    LinearScale,
+    BarElement,
+    Title,
+    Tooltip,
+    Legend,
+    Filler
+)
 
 const options = {
     responsive: true,
     maintainAspectRatio: true,
     scales: {
         y: {
-            display: false,
+            ticks: {
+                display: true,
+            },
+            grid: {
+                display: true,
+                drawBorder: false,
+            },
         },
         x: {
             ticks: {
                 display: true,
+                maxTicksLimit: 10,
             },
             grid: {
                 display: false,
@@ -56,29 +72,11 @@ const TimeSeriesBarSection: React.FC<TimeSeriesBarSectionProps> = ({
     }, [])
     return (
         <div className="flex flex-col gap-4">
-            <div className="w-full rounded-md bg-red-alpha px-4 py-4">
-                <Bar
-                    options={{ ...options }}
-                    data={{
-                        labels: filteredData.map(({ date }) => {
-                            const newDate = new Date(date || '')
-                            return format(newDate, 'dd MMM yyyy')
-                        }),
-                        datasets: [
-                            {
-                                label: 'Death',
-                                data: filteredData.map(
-                                    ({ new_deaths }) => new_deaths
-                                ),
-                                backgroundColor: '#ef4444',
-                                borderRadius: 12,
-                            },
-                        ],
-                    }}
-                />
+            <div>
+                <span>ASD</span>
             </div>
             <div className="w-full rounded-md bg-blue-alpha px-4 py-4">
-                <Bar
+                <Line
                     options={{ ...options }}
                     data={{
                         labels: filteredData.map(({ date }) => {
@@ -91,15 +89,43 @@ const TimeSeriesBarSection: React.FC<TimeSeriesBarSectionProps> = ({
                                 data: filteredData.map(
                                     ({ new_cases }) => new_cases
                                 ),
-                                backgroundColor: '#2563eb',
-                                borderRadius: 12,
+                                backgroundColor: '#1e40af',
+                                borderColor: '#2563eb',
+                                fill: true,
+                                // pointRadius: 0,
+                                tension: 0.3,
                             },
                         ],
                     }}
                 />
             </div>
+            <div className="w-full rounded-md bg-red-alpha px-4 py-4">
+                <Line
+                    options={{ ...options }}
+                    data={{
+                        labels: filteredData.map(({ date }) => {
+                            const newDate = new Date(date || '')
+                            return format(newDate, 'dd MMM yyyy')
+                        }),
+                        datasets: [
+                            {
+                                label: 'Death',
+                                data: filteredData.map(
+                                    ({ new_deaths }) => new_deaths
+                                ),
+                                backgroundColor: '#991b1b',
+                                borderColor: '#ef4444',
+                                fill: true,
+                                // pointRadius: 0,
+                                tension: 0.3,
+                            },
+                        ],
+                    }}
+                />
+            </div>
+
             <div className="w-full rounded-md bg-green-alpha px-4 py-4">
-                <Bar
+                <Line
                     options={{ ...options }}
                     data={{
                         labels: filteredData.map(({ date }) => {
@@ -113,15 +139,18 @@ const TimeSeriesBarSection: React.FC<TimeSeriesBarSectionProps> = ({
                                     ({ new_people_vaccinated_smoothed }) =>
                                         new_people_vaccinated_smoothed
                                 ),
-                                backgroundColor: '#16a34a',
-                                borderRadius: 12,
+                                backgroundColor: '#166534',
+                                borderColor: '#16a34a',
+                                fill: true,
+                                // pointRadius: 0,
+                                tension: 0.3,
                             },
                         ],
                     }}
                 />
             </div>
             <div className="w-full rounded-md bg-amber-alpha px-4 py-4">
-                <Bar
+                <Line
                     options={{ ...options }}
                     data={{
                         labels: filteredData.map(({ date }) => {
@@ -134,8 +163,11 @@ const TimeSeriesBarSection: React.FC<TimeSeriesBarSectionProps> = ({
                                 data: filteredData.map(
                                     ({ positive_rate }) => positive_rate
                                 ),
-                                backgroundColor: '#d97706',
-                                borderRadius: 12,
+                                backgroundColor: '#92400e',
+                                borderColor: '#d97706',
+                                fill: true,
+                                // pointRadius: 0,
+                                tension: 0.3,
                             },
                         ],
                     }}

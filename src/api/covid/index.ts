@@ -1,3 +1,4 @@
+import axios from '@/src/lib/axios'
 import { IApiCovidData } from '@/src/types/api/covid'
 import {
     IApiVaccinationCountry,
@@ -48,4 +49,12 @@ export function useVaccinationCountryList(options?: SWRConfiguration) {
         loading: !error && !data,
         error: error,
     }
+}
+
+export function fetchCompareList(countries: string[]) {
+    return axios
+        .get<IApiCovidData[]>(
+            `/api/country/compare?code=${countries.toString()}`
+        )
+        .then((res) => res.data)
 }

@@ -1,0 +1,9 @@
+version: '3'
+services:
+    nextjs-ui:
+        build:
+            context: .
+        ports:
+            - '3000:3000'
+        environment:
+            - NEXT_PUBLIC_API_ENDPOINT=${NEXT_PUBLIC_API_ENDPOINT}

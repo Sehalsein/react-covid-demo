@@ -2,6 +2,7 @@ import { useCountryList } from '@/src/api/covid'
 import BasicLayout from '@/src/components/Layout'
 import Search from '@/src/components/Search'
 import Table, { TableColumnsProps } from '@/src/components/Table'
+import { useAuth } from '@/src/hooks/useAuth'
 import { IApiCovidData } from '@/src/types/api/covid'
 import TimeSeriesBarSection from '@/src/view/country-list/TimeSeriesBarSection'
 import WorldMapGraph from '@/src/view/country-list/WorldMapGraph'
@@ -36,6 +37,8 @@ const CountryHome = () => {
     const router = useRouter()
     const [isTableExpanded, setTableExpanded] = useState(false)
 
+    const { user } = useAuth()
+
     return (
         <>
             <div
@@ -50,9 +53,41 @@ const CountryHome = () => {
                                 value: location,
                                 id: iso_code,
                             }))}
+                            onSelect={({ id }) => {
+                                router.push({
+                                    pathname: '/country/compare',
+                                    query: {
+                                        code: id,
+                                    },
+                                })
+                            }}
                         />
                     )}
-                    <div className="flex items-center justify-end gap-4">
+                    <div
+                        className={`flex items-center ${
+                            user && user.history
+                                ? 'justify-between'
+                                : 'justify-end'
+                        } gap-4`}
+                    >
+                        {user && user.history && (
+                            <span
+                                className="cursor-pointer text-sm font-medium text-blue-600 underline"
+                                onClick={() => {
+                                    router.push({
+                                        pathname: '/country/compare',
+                                        query: {
+                                            code: user.history.countries.toString(),
+                                            timeSeriesKey:
+                                                user.history.timeSeriesKey,
+                                            statsKey: user.history.statsKey,
+                                        },
+                                    })
+                                }}
+                            >
+                                View Previous Search
+                            </span>
+                        )}
                         <button
                             className="rounded-md bg-slate-200 px-4 py-4 text-slate-600 dark:bg-background-dark-alternate"
                             onClick={() => {

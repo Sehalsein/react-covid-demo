@@ -4,13 +4,13 @@ const axios = axiosInstance.create({
     baseURL: process.env.NEXT_PUBLIC_API_ENDPOINT,
 })
 
-// axios.interceptors.request.use((config) => {
-//   const token = localStorage.getItem('token');
-//   if (token && config.headers) {
-//     config.headers.Authorization = `Bearer ${token}`;
-//   }
-//   return config;
-// });
+axios.interceptors.request.use((config) => {
+    const token = localStorage.getItem('token')
+    if (token && config.headers) {
+        config.headers.Authorization = `Bearer ${token}`
+    }
+    return config
+})
 
 // axios.interceptors.response.use(
 //   (response) => response,

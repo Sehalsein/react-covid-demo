@@ -7,7 +7,7 @@ interface SearchData {
 }
 interface SearchProps {
     data: SearchData[]
-    onSelect: (data: SearchData) => void
+    onSelect?: (data: SearchData) => void
 }
 
 const Search: React.FC<SearchProps> = ({ data, onSelect }) => {
@@ -15,7 +15,7 @@ const Search: React.FC<SearchProps> = ({ data, onSelect }) => {
 
     return (
         <div className="flex flex-col gap-2">
-            <div className="m-auto flex w-full max-w-3xl items-center gap-4 rounded-md bg-slate-200 px-2 py-2 text-left text-slate-600 focus-within:outline-0 focus:border-blue-300  focus:bg-blue-200 focus:ring-0 dark:bg-background-dark-alternate dark:text-slate-400">
+            <div className="m-auto flex w-full  items-center gap-4 rounded-md bg-slate-200 px-2 py-2 text-left text-slate-600 focus-within:outline-0 focus:border-blue-300  focus:bg-blue-200 focus:ring-0 dark:bg-background-dark-alternate dark:text-slate-400">
                 <svg
                     xmlns="http://www.w3.org/2000/svg"
                     className="h-6 w-6"
@@ -32,14 +32,14 @@ const Search: React.FC<SearchProps> = ({ data, onSelect }) => {
                 </svg>
                 <input
                     className="flex-1 bg-slate-200 py-2 text-slate-600 dark:bg-background-dark-alternate dark:text-slate-400"
-                    placeholder="Search your country"
+                    placeholder="Search country to compare"
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                 />
             </div>
 
             {search && (
-                <div className="m-auto flex w-full max-w-3xl flex-col divide-y divide-solid divide-slate-200 rounded-md dark:divide-background-dark dark:bg-background-dark-alternate dark:text-slate-400">
+                <div className="m-auto flex w-full flex-col divide-y divide-solid divide-slate-200 rounded-md dark:divide-background-dark dark:bg-background-dark-alternate dark:text-slate-400">
                     {renderCollection(
                         data
                             .filter(({ value }) =>
@@ -56,7 +56,7 @@ const Search: React.FC<SearchProps> = ({ data, onSelect }) => {
                                     className="flex cursor-pointer items-center justify-between py-4 px-4 hover:bg-slate-100 dark:hover:bg-background-dark"
                                     onClick={() => {
                                         setSearch('')
-                                        onSelect({ id, value })
+                                        if (onSelect) onSelect({ id, value })
                                     }}
                                 >
                                     <span className="">{value}</span>
@@ -68,7 +68,7 @@ const Search: React.FC<SearchProps> = ({ data, onSelect }) => {
                         },
                         () => {
                             return (
-                                <span className="flex cursor-pointer items-center justify-between py-4 px-4 hover:bg-slate-100">
+                                <span className="flex cursor-pointer items-center justify-between py-4 px-4 hover:bg-slate-100 dark:hover:bg-background-dark">
                                     No Data
                                 </span>
                             )

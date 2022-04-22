@@ -1,3 +1,4 @@
+import { latestSearch } from '@/src/api/auth'
 import { fetchCompareList, useCountryList } from '@/src/api/covid'
 import BasicLayout from '@/src/components/Layout'
 import Search from '@/src/components/Search'
@@ -65,12 +66,11 @@ const options = {
     },
 }
 
-const CountryHome = () => {
+const CountryCompare = () => {
     const [compareData, setCompareData] = useState<IApiCovidData[]>([])
     const [loading, setLoading] = useState(true)
     const [countriesList, setCountriesList] = useState<string[]>([])
     const router = useRouter()
-
     const { data: locationList } = useCountryList()
     const [dataSetKey, setDataSetKey] = useState('')
     const [compareKey, setCompareKey] = useState('')
@@ -87,9 +87,17 @@ const CountryHome = () => {
     }
 
     useEffect(() => {
-        const { code } = router.query
+        const { code, timeSeriesKey, statsKey } = router.query
         if (code) {
             setCountriesList((code as string).split(','))
+        }
+
+        if (timeSeriesKey) {
+            setDataSetKey(timeSeriesKey.toString())
+        }
+
+        if (statsKey) {
+            setCompareKey(statsKey.toString())
         }
     }, [router])
 
@@ -101,6 +109,20 @@ const CountryHome = () => {
         }
     }, [countriesList])
 
+    useEffect(() => {
+        latestSearch({
+            countries: countriesList,
+            timeSeriesKey: dataSetKey,
+            statsKey: compareKey,
+        })
+            .then(() => {
+                console.log('Search Updated')
+            })
+            .catch(() => {
+                console.log('Search Update Error')
+            })
+    }, [countriesList, compareKey, dataSetKey])
+
     const columns: TableColumnsProps<IApiCovidData>[] = [
         {
             title: 'Country',
@@ -111,17 +133,27 @@ const CountryHome = () => {
             key: '',
             renderView: (row) => {
                 return (
-                    <div
-                        className="flex justify-center"
-                        onClick={() => {
-                            setCountriesList([
-                                ...countriesList.filter(
-                                    (e) => e !== row.iso_code
-                                ),
-                            ])
-                        }}
-                    >
-                        <span className="text-blue-600">DELETE</span>
+                    <div className="flex justify-center gap-8">
+                        <span
+                            className="text-blue-600"
+                            onClick={() => {
+                                setCountriesList([
+                                    ...countriesList.filter(
+                                        (e) => e !== row.iso_code
+                                    ),
+                                ])
+                            }}
+                        >
+                            DELETE
+                        </span>
+                        <span
+                            className="text-blue-600"
+                            onClick={() => {
+                                router.push(`/country/${row.iso_code}`)
+                            }}
+                        >
+                            DETAIL
+                        </span>
                     </div>
                 )
             },
@@ -172,6 +204,7 @@ const CountryHome = () => {
                                     onChange={(e) => {
                                         setDataSetKey(e.target.value)
                                     }}
+                                    value={dataSetKey}
                                 >
                                     {/* {Object.keys(data[0]).map((e) => {
                                         return (
@@ -180,6 +213,8 @@ const CountryHome = () => {
                                             </option>
                                         )
                                     })} */}
+
+                                    <option value={''}>Select Attribute</option>
 
                                     {compareData[0] &&
                                         compareData[0].data &&
@@ -199,38 +234,41 @@ const CountryHome = () => {
                                             })}
                                 </select>
                             </div>
-                            <div className="w-full rounded-md bg-blue-alpha px-4 py-4">
-                                <Line
-                                    options={options}
-                                    data={{
-                                        labels,
-                                        datasets: [
-                                            ...compareData.map(
-                                                ({
-                                                    location,
-                                                    data,
-                                                    ...rest
-                                                }) => ({
-                                                    label: location,
-                                                    data: data?.map((d) =>
-                                                        dataSetKey in d
-                                                            ? (d as any)[
-                                                                  dataSetKey
-                                                              ]
-                                                            : dataSetKey in rest
-                                                            ? (rest as any)[
-                                                                  dataSetKey
-                                                              ]
-                                                            : 0
-                                                    ),
-                                                    borderColor:
-                                                        getRandomColor(),
-                                                })
-                                            ),
-                                        ],
-                                    }}
-                                />
-                            </div>
+                            {dataSetKey && (
+                                <div className="w-full rounded-md bg-blue-alpha px-4 py-4">
+                                    <Line
+                                        options={options}
+                                        data={{
+                                            labels,
+                                            datasets: [
+                                                ...compareData.map(
+                                                    ({
+                                                        location,
+                                                        data,
+                                                        ...rest
+                                                    }) => ({
+                                                        label: location,
+                                                        data: data?.map((d) =>
+                                                            dataSetKey in d
+                                                                ? (d as any)[
+                                                                      dataSetKey
+                                                                  ]
+                                                                : dataSetKey in
+                                                                  rest
+                                                                ? (rest as any)[
+                                                                      dataSetKey
+                                                                  ]
+                                                                : 0
+                                                        ),
+                                                        borderColor:
+                                                            getRandomColor(),
+                                                    })
+                                                ),
+                                            ],
+                                        }}
+                                    />
+                                </div>
+                            )}
                         </div>
                     )}
                 </div>
@@ -247,7 +285,9 @@ const CountryHome = () => {
                                     onChange={(e) => {
                                         setCompareKey(e.target.value)
                                     }}
+                                    value={compareKey}
                                 >
+                                    <option value={''}>Select Attribute</option>
                                     {Object.keys(compareData[0])
                                         .filter(
                                             (e) =>
@@ -268,45 +308,48 @@ const CountryHome = () => {
                                 </select>
                             </div>
 
-                            <div className="w-full rounded-md bg-blue-alpha px-4 py-4">
-                                <Bar
-                                    options={{
-                                        scales: {
-                                            x: {
-                                                type: 'category',
-                                                labels: [
-                                                    compareKey.replaceAll(
-                                                        '_',
-                                                        ' '
-                                                    ),
-                                                ],
-                                            },
-                                        },
-                                    }}
-                                    data={{
-                                        labels: countriesList,
-                                        datasets: [
-                                            ...countriesList.map((val) => {
-                                                const d = compareData.find(
-                                                    (e) => e.iso_code === val
-                                                )
-                                                return {
-                                                    label: val,
-                                                    data: [
-                                                        d && compareKey in d
-                                                            ? (d as any)[
-                                                                  compareKey
-                                                              ]
-                                                            : 0,
+                            {compareKey && (
+                                <div className="w-full rounded-md bg-blue-alpha px-4 py-4">
+                                    <Bar
+                                        options={{
+                                            scales: {
+                                                x: {
+                                                    type: 'category',
+                                                    labels: [
+                                                        compareKey.replaceAll(
+                                                            '_',
+                                                            ' '
+                                                        ),
                                                     ],
-                                                    backgroundColor:
-                                                        getRandomColor(),
-                                                }
-                                            }),
-                                        ],
-                                    }}
-                                />
-                            </div>
+                                                },
+                                            },
+                                        }}
+                                        data={{
+                                            labels: countriesList,
+                                            datasets: [
+                                                ...countriesList.map((val) => {
+                                                    const d = compareData.find(
+                                                        (e) =>
+                                                            e.iso_code === val
+                                                    )
+                                                    return {
+                                                        label: val,
+                                                        data: [
+                                                            d && compareKey in d
+                                                                ? (d as any)[
+                                                                      compareKey
+                                                                  ]
+                                                                : 0,
+                                                        ],
+                                                        backgroundColor:
+                                                            getRandomColor(),
+                                                    }
+                                                }),
+                                            ],
+                                        }}
+                                    />
+                                </div>
+                            )}
                         </div>
                     )}
                 </div>
@@ -315,7 +358,7 @@ const CountryHome = () => {
     )
 }
 
-CountryHome.getLayout = function getLayout(page: React.ReactElement) {
+CountryCompare.getLayout = function getLayout(page: React.ReactElement) {
     return <BasicLayout>{page}</BasicLayout>
 }
-export default CountryHome
+export default CountryCompare

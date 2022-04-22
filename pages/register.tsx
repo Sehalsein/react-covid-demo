@@ -1,21 +1,20 @@
-import { useAuth } from '@/src/hooks/useAuth'
+import { register } from '@/src/api/auth'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 
-const LoginPage = () => {
+const RegisterPage = () => {
     const router = useRouter()
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [loading, setLoading] = useState(false)
-    const { login } = useAuth()
 
     return (
         <div className="flex items-center justify-center bg-background-light dark:bg-background-dark">
             <div className="flex w-full max-w-lg flex-col gap-12 rounded-lg bg-background-light px-6 py-24 shadow-xl dark:bg-background-dark-alternate">
                 <div>
                     <h1 className="text-5xl font-bold text-slate-600 dark:text-slate-200">
-                        Login
+                        Register
                     </h1>
                 </div>
 
@@ -44,9 +43,9 @@ const LoginPage = () => {
                         className="mt-4 rounded-md bg-blue-600 px-2 py-2 font-bold uppercase text-white"
                         onClick={() => {
                             setLoading(true)
-                            login(email, password)
+                            register({ email, password })
                                 .then(() => {
-                                    router.push('/country')
+                                    router.push('/login')
                                 })
                                 .catch(() => {
                                     alert('Error')
@@ -59,10 +58,11 @@ const LoginPage = () => {
                         Login
                     </button>
                 </div>
+
                 <div className="w-full text-center">
-                    <Link href="/register" passHref>
+                    <Link href="/login" passHref>
                         <span className="cursor-pointer text-slate-600 underline dark:text-slate-200">
-                            Create a new account. Register
+                            Already have an account? Login
                         </span>
                     </Link>
                 </div>
@@ -71,4 +71,4 @@ const LoginPage = () => {
     )
 }
 
-export default LoginPage
+export default RegisterPage

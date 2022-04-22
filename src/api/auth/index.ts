@@ -12,6 +12,10 @@ export function login(payload: IApiLoginRequestBody) {
         .then((res) => res.data)
 }
 
+export function register(payload: IApiLoginRequestBody) {
+    return axios.post(`/api/auth/register`, payload).then((res) => res.data)
+}
+
 export function useCurrentUser(options?: SWRConfiguration) {
     const { data, error, mutate } = useSWR<IApiUserProfile>(
         '/api/user/profile',

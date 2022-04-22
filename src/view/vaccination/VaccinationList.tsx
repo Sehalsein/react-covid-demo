@@ -52,8 +52,6 @@ interface VaccinationListProps {
 
 const VaccinationList: React.FC<VaccinationListProps> = ({ location }) => {
     const { data, loading } = useVaccinationList(location)
-
-    console.log(data)
     return <Table columns={columns} data={data} loading={loading} />
 }
 

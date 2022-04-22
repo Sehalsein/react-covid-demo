@@ -43,7 +43,6 @@ const LoginPage = () => {
                         className="mt-4 rounded-md bg-blue-600 px-2 py-2 font-bold uppercase text-white"
                         onClick={() => {
                             setLoading(true)
-
                             login(email, password)
                                 .then(() => {
                                     router.push('/country')

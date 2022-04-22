@@ -76,7 +76,6 @@ const VaccinationListPage = () => {
                         }}
                     />
                 </div>
-                <h1>Table VaccinationListPage</h1>
             </div>
         </>
     )

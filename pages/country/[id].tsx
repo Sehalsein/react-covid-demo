@@ -90,8 +90,6 @@ const CountryDetailPage = () => {
         updateChartData(activeTab)
     }, [activeTab])
 
-    console.log(data)
-
     if (!data || loading) {
         return <span>Loading</span>
     }

@@ -64,8 +64,6 @@ const TimeSeriesBarSection: React.FC<TimeSeriesBarSectionProps> = ({
     data,
 }) => {
     const [filteredData, setFilteredData] = useState(data)
-    // const [isBarChart, setIsBarChart] = useState(false)
-    // console.log(data)
 
     useEffect(() => {
         setFilteredData([...data].splice(-30))

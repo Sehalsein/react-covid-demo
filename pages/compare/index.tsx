@@ -5,6 +5,7 @@ import Table, { TableColumnsProps } from '@/src/components/Table'
 import { IApiCovidData } from '@/src/types/api/covid'
 import { getRandomColor } from '@/src/utils/misc'
 import {
+    BarElement,
     CategoryScale,
     Chart as ChartJS,
     Legend,
@@ -17,13 +18,14 @@ import {
 import format from 'date-fns/format'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import { Line } from 'react-chartjs-2'
+import { Bar, Line } from 'react-chartjs-2'
 
 ChartJS.register(
     CategoryScale,
     LinearScale,
     PointElement,
     LineElement,
+    BarElement,
     Title,
     Tooltip,
     Legend
@@ -70,7 +72,8 @@ const CountryHome = () => {
     const router = useRouter()
 
     const { data: locationList } = useCountryList()
-    const [currentKey, setCurrentKey] = useState('')
+    const [dataSetKey, setDataSetKey] = useState('')
+    const [compareKey, setCompareKey] = useState('')
 
     const fetchCompareData = (key: string[]) => {
         setLoading(true)
@@ -107,16 +110,10 @@ const CountryHome = () => {
             title: 'Actions',
             key: '',
             renderView: (row) => {
-                console.log(row)
                 return (
                     <div
                         className="flex justify-center"
                         onClick={() => {
-                            console.log('DELETE ITEM', row.iso_code, [
-                                ...countriesList.filter(
-                                    (e) => e !== row.iso_code
-                                ),
-                            ])
                             setCountriesList([
                                 ...countriesList.filter(
                                     (e) => e !== row.iso_code
@@ -167,14 +164,13 @@ const CountryHome = () => {
                         <div className="flex flex-col gap-6">
                             <div className="flex flex-col gap-2">
                                 <label className="text-slate-600 dark:text-slate-400">
-                                    Select Attribute
+                                    Select Time Series Attribute
                                 </label>
                                 <select
                                     className="bg-slate-200 px-2 py-2 py-2 text-slate-600 dark:bg-background-dark-alternate dark:text-slate-400"
                                     name="Select Attribute"
                                     onChange={(e) => {
-                                        console.log(e.target.value)
-                                        setCurrentKey(e.target.value)
+                                        setDataSetKey(e.target.value)
                                     }}
                                 >
                                     {/* {Object.keys(data[0]).map((e) => {
@@ -217,13 +213,13 @@ const CountryHome = () => {
                                                 }) => ({
                                                     label: location,
                                                     data: data?.map((d) =>
-                                                        currentKey in d
+                                                        dataSetKey in d
                                                             ? (d as any)[
-                                                                  currentKey
+                                                                  dataSetKey
                                                               ]
-                                                            : currentKey in rest
+                                                            : dataSetKey in rest
                                                             ? (rest as any)[
-                                                                  currentKey
+                                                                  dataSetKey
                                                               ]
                                                             : 0
                                                     ),
@@ -231,6 +227,82 @@ const CountryHome = () => {
                                                         getRandomColor(),
                                                 })
                                             ),
+                                        ],
+                                    }}
+                                />
+                            </div>
+                        </div>
+                    )}
+                </div>
+                <div className="flex flex-col gap-6">
+                    {!loading && compareData.length > 0 && (
+                        <div className="flex flex-col gap-6">
+                            <div className="flex flex-col gap-2">
+                                <label className="text-slate-600 dark:text-slate-400">
+                                    Select Attribute
+                                </label>
+                                <select
+                                    className="bg-slate-200 px-2 py-2 py-2 text-slate-600 dark:bg-background-dark-alternate dark:text-slate-400"
+                                    name="Select Attribute"
+                                    onChange={(e) => {
+                                        setCompareKey(e.target.value)
+                                    }}
+                                >
+                                    {Object.keys(compareData[0])
+                                        .filter(
+                                            (e) =>
+                                                ![
+                                                    'data',
+                                                    'continent',
+                                                    'location',
+                                                    'iso_code',
+                                                ].includes(e.toLowerCase())
+                                        )
+                                        .map((e) => {
+                                            return (
+                                                <option key={e} value={e}>
+                                                    {e.replaceAll('_', ' ')}
+                                                </option>
+                                            )
+                                        })}
+                                </select>
+                            </div>
+
+                            <div className="w-full rounded-md bg-blue-alpha px-4 py-4">
+                                <Bar
+                                    options={{
+                                        scales: {
+                                            x: {
+                                                type: 'category',
+                                                labels: [
+                                                    compareKey.replaceAll(
+                                                        '_',
+                                                        ' '
+                                                    ),
+                                                ],
+                                            },
+                                        },
+                                    }}
+                                    data={{
+                                        labels: countriesList,
+                                        datasets: [
+                                            ...countriesList.map((val) => {
+                                                const d = compareData.find(
+                                                    (e) => e.iso_code === val
+                                                )
+                                                return {
+                                                    label: val,
+                                                    data: [
+                                                        d && compareKey in d
+                                                            ? (d as any)[
+                                                                  compareKey
+                                                              ]
+                                                            : 0,
+                                                    ],
+                                                    backgroundColor:
+                                                        getRandomColor(),
+                                                }
+                                            }),
                                         ],
                                     }}
                                 />
